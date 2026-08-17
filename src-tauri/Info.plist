@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>cue reads your upcoming calendar events so it can remind you before they start. Everything stays on your Mac.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>cue reads your upcoming calendar events so it can remind you before they start. Everything stays on your Mac.</string>
+	<key>LSUIElement</key>
+	<true/>
+</dict>
+</plist>
