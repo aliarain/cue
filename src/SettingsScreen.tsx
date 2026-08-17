@@ -54,7 +54,7 @@ export default function SettingsScreen() {
       <section>
         <h2>Alerts</h2>
         <label className="row">
-          <span>Heads-up notification</span>
+          <span>Heads-up pill</span>
           <select
             value={settings.warn_minutes}
             onChange={(e) => update({ warn_minutes: Number(e.target.value) })}

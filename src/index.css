@@ -210,6 +210,108 @@ button {
 }
 
 /* ------------------------------------------------------------
+   Heads-up pill (floating status card, top of screen)
+   ------------------------------------------------------------ */
+
+.banner-body {
+  background: transparent;
+}
+
+.banner-root {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 6px;
+}
+
+.banner-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  background: rgba(26, 26, 34, 0.97);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 8px 8px 8px 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.35);
+  animation: banner-in 0.35s var(--ease);
+}
+
+@keyframes banner-in {
+  from {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.banner-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+  animation: banner-pulse 2s ease-in-out infinite;
+}
+
+@keyframes banner-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(53, 199, 90, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(53, 199, 90, 0);
+  }
+}
+
+.banner-text {
+  font-size: 15px;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.banner-text b {
+  color: var(--text-1);
+  font-weight: 700;
+}
+
+.banner-join {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: filter 0.12s var(--ease), transform 0.12s var(--ease);
+}
+
+.banner-join:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.banner-x {
+  background: none;
+  color: var(--text-3);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: color 0.12s var(--ease);
+}
+
+.banner-x:hover {
+  color: var(--text-1);
+}
+
+/* ------------------------------------------------------------
    Quick add
    ------------------------------------------------------------ */
 

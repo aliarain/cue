@@ -80,6 +80,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::get_alert_payload,
             commands::alert_action,
+            commands::get_banner_payload,
+            commands::banner_action,
             commands::create_quick_reminder,
             commands::preview_quick_reminder,
             commands::close_quickadd,

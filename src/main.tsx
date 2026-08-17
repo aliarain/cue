@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import AlertScreen from "./AlertScreen";
+import Banner from "./Banner";
 import QuickAdd from "./QuickAdd";
 import SettingsScreen from "./SettingsScreen";
 import "./index.css";
@@ -12,6 +13,9 @@ let screen: React.ReactElement;
 if (label.startsWith("alert-")) {
   document.body.classList.add("alert-body");
   screen = <AlertScreen />;
+} else if (label === "banner") {
+  document.body.classList.add("banner-body");
+  screen = <Banner />;
 } else if (label === "quickadd") {
   document.body.classList.add("quickadd-body");
   screen = <QuickAdd />;

@@ -3,7 +3,6 @@
 use std::time::Duration;
 
 use tauri::{AppHandle, Manager};
-use tauri_plugin_notification::NotificationExt;
 
 use crate::models::*;
 use crate::state::{save_data, AppState};
@@ -21,7 +20,8 @@ pub fn spawn(app: AppHandle) {
 
 fn tick(app: &AppHandle) {
     let now = now_ms();
-    let mut notifications: Vec<AlertItem> = Vec::new();
+    let mut banner: Option<AlertItem> = None;
+    let mut banner_expired = false;
     let mut takeover: Option<AlertPayload> = None;
     let mut data_to_save: Option<PersistedData> = None;
 
@@ -93,7 +93,7 @@ fn tick(app: &AppHandle) {
                         && now < start - takeover_ms
                         && inner.fired.insert(key("warn"))
                     {
-                        notifications.push(item.clone());
+                        banner = Some(item.clone());
                     }
                     if settings.takeover_minutes > 0
                         && now >= start - takeover_ms
@@ -127,19 +127,25 @@ fn tick(app: &AppHandle) {
             inner.data.reminders.retain(|r| !fired_reminders.contains(&r.id));
             data_to_save = Some(inner.data.clone());
         }
+
+        // The heads-up pill lives until its event starts, gets acted on,
+        // or reminders are paused — then it quietly leaves.
+        if let Some(current) = &inner.current_banner {
+            let acted = inner.interactions.contains_key(&current.id);
+            if now >= current.start_ms || acted || paused {
+                banner_expired = true;
+            }
+        }
     }
 
     if let Some(data) = data_to_save {
         save_data(app, &data);
     }
-    for item in notifications {
-        let mins = ((item.start_ms - now).max(0) / 60_000).max(1);
-        let _ = app
-            .notification()
-            .builder()
-            .title(&item.title)
-            .body(format!("Starts in {mins} min"))
-            .show();
+    if banner_expired {
+        alerts::close_banner(app);
+    }
+    if let Some(item) = banner {
+        alerts::show_banner(app, item);
     }
     if let Some(payload) = takeover {
         alerts::show_alert(app, payload);

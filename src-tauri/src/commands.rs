@@ -13,6 +13,39 @@ pub fn get_alert_payload(state: State<AppState>) -> Option<AlertPayload> {
 }
 
 #[tauri::command]
+pub fn get_banner_payload(state: State<AppState>) -> Option<AlertItem> {
+    state.inner.lock().unwrap().current_banner.clone()
+}
+
+#[tauri::command]
+pub fn banner_action(app: AppHandle, action: String) {
+    let item = {
+        let state = app.state::<AppState>();
+        let guard = state.inner.lock().unwrap();
+        guard.current_banner.clone()
+    };
+    let Some(item) = item else {
+        alerts::close_banner(&app);
+        return;
+    };
+    if action == "join" {
+        if item.kind != ItemKind::Test {
+            let state = app.state::<AppState>();
+            state
+                .inner
+                .lock()
+                .unwrap()
+                .interactions
+                .insert(item.id.clone(), Interaction::Joined);
+        }
+        if let Some(url) = &item.meeting_url {
+            let _ = app.opener().open_url(url.clone(), None::<&str>);
+        }
+    }
+    alerts::close_banner(&app);
+}
+
+#[tauri::command]
 pub fn alert_action(app: AppHandle, action: String) {
     let payload = {
         let state = app.state::<AppState>();

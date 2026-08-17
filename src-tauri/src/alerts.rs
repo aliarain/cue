@@ -9,12 +9,82 @@ use crate::state::AppState;
 const NS_SCREEN_SAVER_WINDOW_LEVEL: isize = 1000;
 
 pub fn show_alert(app: &AppHandle, payload: AlertPayload) {
+    close_banner(app); // the takeover supersedes any heads-up pill
     {
         let state = app.state::<AppState>();
         state.inner.lock().unwrap().current_alert = Some(payload);
     }
     let app2 = app.clone();
     let _ = app.run_on_main_thread(move || create_windows(&app2));
+}
+
+/// Heads-up pill: a small floating status card at the top of the primary
+/// screen ("<title> starts in 3 minutes · Join"), used for the warn stage.
+pub fn show_banner(app: &AppHandle, item: AlertItem) {
+    {
+        let state = app.state::<AppState>();
+        let mut inner = state.inner.lock().unwrap();
+        inner.current_banner = Some(item);
+        inner.banner_shown_ms = now_ms();
+    }
+    let app2 = app.clone();
+    let _ = app.run_on_main_thread(move || create_banner_window(&app2));
+}
+
+pub fn close_banner(app: &AppHandle) {
+    let had_banner = {
+        let state = app.state::<AppState>();
+        let mut inner = state.inner.lock().unwrap();
+        inner.current_banner.take().is_some()
+    };
+    if !had_banner {
+        return;
+    }
+    let app2 = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        if let Some(window) = app2.get_webview_window("banner") {
+            let _ = window.close();
+        }
+    });
+}
+
+const BANNER_W: f64 = 560.0;
+const BANNER_H: f64 = 64.0;
+
+fn create_banner_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("banner") {
+        let _ = window.show();
+        let _ = app.emit("banner-updated", ());
+        return;
+    }
+    let Ok(Some(monitor)) = app.primary_monitor() else { return };
+    let scale = monitor.scale_factor();
+    let mon_x = monitor.position().x as f64 / scale;
+    let mon_w = monitor.size().width as f64 / scale;
+    let x = mon_x + (mon_w - BANNER_W) / 2.0;
+    let y = monitor.position().y as f64 / scale + 40.0;
+
+    let built = WebviewWindowBuilder::new(app, "banner", WebviewUrl::App("index.html".into()))
+        .title("cue heads-up")
+        .decorations(false)
+        .transparent(true)
+        .shadow(false)
+        .always_on_top(true)
+        .visible_on_all_workspaces(true)
+        .skip_taskbar(true)
+        .accept_first_mouse(true)
+        .focused(false)
+        .position(x, y)
+        .inner_size(BANNER_W, BANNER_H)
+        .build();
+    match built {
+        Ok(window) => {
+            // Don't steal keyboard focus for a heads-up pill.
+            #[cfg(target_os = "macos")]
+            boost_window(&window, false);
+        }
+        Err(e) => eprintln!("cue: failed to create banner window: {e}"),
+    }
 }
 
 pub fn close_alerts(app: &AppHandle) {
@@ -53,6 +123,23 @@ pub fn show_test_alert(app: &AppHandle) {
     );
 }
 
+pub fn show_test_banner(app: &AppHandle) {
+    let now = now_ms();
+    show_banner(
+        app,
+        AlertItem {
+            id: format!("test:{now}"),
+            kind: ItemKind::Test,
+            title: "Weekly design sync".into(),
+            start_ms: now + 3 * 60_000,
+            end_ms: None,
+            meeting_url: Some("https://meet.google.com/abc-defg-hij".into()),
+            provider: Some("Google Meet".into()),
+            calendar: None,
+        },
+    );
+}
+
 fn create_windows(app: &AppHandle) {
     let already_open = app
         .webview_windows()
@@ -84,7 +171,7 @@ fn create_windows(app: &AppHandle) {
         match built {
             Ok(window) => {
                 #[cfg(target_os = "macos")]
-                boost_window(&window);
+                boost_window(&window, true);
             }
             Err(e) => eprintln!("cue: failed to create alert window {label}: {e}"),
         }
@@ -93,7 +180,7 @@ fn create_windows(app: &AppHandle) {
 
 /// Raise the NSWindow above full-screen apps and pin it to every Space.
 #[cfg(target_os = "macos")]
-fn boost_window(window: &tauri::WebviewWindow) {
+fn boost_window(window: &tauri::WebviewWindow, make_key: bool) {
     use objc2_app_kit::{NSWindow, NSWindowCollectionBehavior};
 
     let Ok(ptr) = window.ns_window() else { return };
@@ -105,6 +192,10 @@ fn boost_window(window: &tauri::WebviewWindow) {
                 | NSWindowCollectionBehavior::FullScreenAuxiliary
                 | NSWindowCollectionBehavior::Stationary,
         );
-        ns.makeKeyAndOrderFront(None);
+        if make_key {
+            ns.makeKeyAndOrderFront(None);
+        } else {
+            ns.orderFrontRegardless();
+        }
     }
 }

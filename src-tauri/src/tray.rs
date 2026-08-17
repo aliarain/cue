@@ -45,6 +45,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
     )?;
 
     let test = MenuItem::with_id(app, "test-alert", "Show Test Alert", true, None::<&str>)?;
+    let test_pill = MenuItem::with_id(app, "test-pill", "Show Test Pill", true, None::<&str>)?;
     let settings = MenuItem::with_id(app, "settings", "Settings…", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Quit cue", true, Some("Cmd+Q"))?;
 
@@ -58,6 +59,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
             &pause_menu,
             &PredefinedMenuItem::separator(app)?,
             &test,
+            &test_pill,
             &settings,
             &PredefinedMenuItem::separator(app)?,
             &quit,
@@ -111,6 +113,7 @@ fn handle_menu(app: &AppHandle, id: &str) {
         "pause-forever" => set_pause(app, Some(i64::MAX)),
         "resume" => set_pause(app, None),
         "test-alert" => alerts::show_test_alert(app),
+        "test-pill" => alerts::show_test_banner(app),
         "settings" => windows::open_settings(app),
         "quit" => app.exit(0),
         _ => {}

@@ -21,6 +21,8 @@ pub struct Inner {
     pub interactions: HashMap<String, Interaction>,
     pub paused_until: Option<i64>, // i64::MAX = until manually resumed
     pub current_alert: Option<AlertPayload>,
+    pub current_banner: Option<AlertItem>,
+    pub banner_shown_ms: i64,
 }
 
 impl Inner {
