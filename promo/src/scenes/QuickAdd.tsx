@@ -27,17 +27,10 @@ const Key: React.FC<{ label: string }> = ({ label }) => (
 export const QuickAdd: React.FC<{ frames: number }> = ({ frames }) => {
   const frame = useCurrentFrame();
 
-  // Two demo entries, one after the other.
-  const firstStart = 40;
-  const secondStart = Math.round(frames * 0.55);
-  const first = "tea in 10m";
-  const second = "call Ahmed at 9pm";
-  const inSecond = frame >= secondStart;
-  const text = inSecond ? typed(second, frame, secondStart) : typed(first, frame, firstStart);
-  const done = inSecond
-    ? text.length === second.length
-    : text.length === first.length;
-  const hint = inSecond ? "⏰ call Ahmed — 9:00 PM (in 47m)" : "⏰ tea — 9:41 PM (in 10m)";
+  const demo = "tea in 10m";
+  const text = typed(demo, frame, 34);
+  const done = text.length === demo.length;
+  const hint = "⏰ tea — 9:41 PM (in 10m)";
 
   const caret = Math.floor(frame / 14) % 2 === 0;
   const keysIn = interpolate(frame, [6, 24], [0, 1], {

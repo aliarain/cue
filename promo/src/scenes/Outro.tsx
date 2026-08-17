@@ -12,8 +12,8 @@ export const Outro: React.FC<{ frames: number }> = ({ frames }) => {
   const pop = spring({ frame, fps, config: { damping: 12 } });
 
   const lines = [
-    { text: "brew tap aliarain/tap", start: 30 },
-    { text: "brew install --cask cue", start: 62 },
+    { text: "brew tap aliarain/tap", start: 18 },
+    { text: "brew install --cask cue", start: 48 },
   ];
 
   return (
@@ -48,7 +48,7 @@ export const Outro: React.FC<{ frames: number }> = ({ frames }) => {
             <div
               style={{
                 color: C.accent,
-                opacity: interpolate(frame, [96, 110], [0, 1], {
+                opacity: interpolate(frame, [78, 92], [0, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                 }),

@@ -19,15 +19,15 @@ const codeLine = (w: number, indent: number, tint: string) => (
 export const Problem: React.FC<{ frames: number }> = ({ frames }) => {
   const frame = useCurrentFrame();
 
-  const notifX = interpolate(frame, [18, 34, 92, 108], [480, 0, 0, 40], {
+  const notifX = interpolate(frame, [10, 24, 62, 76], [480, 0, 0, 40], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const notifOpacity = interpolate(frame, [18, 34, 92, 108], [0, 1, 1, 0], {
+  const notifOpacity = interpolate(frame, [10, 24, 62, 76], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const missedIn = interpolate(frame, [128, 146], [0, 1], {
+  const missedIn = interpolate(frame, [84, 100], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });

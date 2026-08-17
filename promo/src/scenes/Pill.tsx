@@ -12,7 +12,7 @@ export const Pill: React.FC<{ frames: number }> = ({ frames }) => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const label = interpolate(frame, [50, 70], [0, 1], {
+  const label = interpolate(frame, [40, 58], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
