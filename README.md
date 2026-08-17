@@ -66,13 +66,19 @@ xattr -cr /Applications/cue.app
 
 Two easy paths:
 
-1. **GitHub Releases** — run `npm run tauri build`, attach the DMG to a release. Anyone installs by downloading the DMG (see unsigned note above).
-2. **Homebrew tap** — create a repo `aliarain/homebrew-tap` with a cask pointing at the release DMG. Then anyone can:
+1. **Homebrew** (recommended) — the cask lives in [aliarain/homebrew-tap](https://github.com/aliarain/homebrew-tap):
 
    ```bash
    brew tap aliarain/tap
+   brew trust aliarain/tap   # skips Gatekeeper quarantine for this unsigned app
    brew install --cask cue
    ```
+
+   On older Homebrew versions without `brew trust`, use `brew install --cask --no-quarantine cue`.
+
+2. **GitHub Releases** — grab the DMG from [Releases](https://github.com/aliarain/cue/releases), drag `cue.app` to Applications (see unsigned note above).
+
+New versions: `npm run tauri build`, attach the DMG to a new GitHub release, then bump `version` and `sha256` in the tap's `Casks/cue.rb`.
 
 For friction-free installs (no Gatekeeper workarounds), you'll eventually want an [Apple Developer ID](https://developer.apple.com/programs/) ($99/yr) to sign + notarize the DMG — Tauri supports this out of the box via `APPLE_SIGNING_IDENTITY` / notarization env vars in `tauri build`.
 
